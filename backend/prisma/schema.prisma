@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  patient
+  doctor
+  admin
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(patient)
+  createdAt    DateTime @default(now())
+
+  healthProfile HealthProfile?
+  dailyRecords  DailyRecord[]
+}
+
+model HealthProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  age               Int
+  gender            String
+  heightCm          Float
+  weightKg          Float
+  chronicConditions String[]
+  medications       String[]
+  allergies         String?
+  updatedAt         DateTime @updatedAt
+}
+
+model DailyRecord {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  recordDate      DateTime @db.Date
+  systolic        Int?
+  diastolic       Int?
+  bloodGlucose    Float?
+  heartRate       Int?
+  weightKg        Float?
+  sleepHours      Float?
+  exerciseMinutes Int?
+  waterMl         Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, recordDate])
+}
