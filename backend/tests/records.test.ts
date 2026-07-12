@@ -74,6 +74,11 @@ describe('POST /records', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.id).toBe('r1');
+    expect(mockedPrisma.dailyRecord.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId_recordDate: { userId: 'user-1', recordDate: new Date('2026-07-12') } },
+      })
+    );
   });
 });
 
@@ -92,5 +97,10 @@ describe('GET /records', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(2);
+    expect(mockedPrisma.dailyRecord.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: { recordDate: 'asc' },
+      })
+    );
   });
 });
