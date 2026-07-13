@@ -30,18 +30,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     SecureStore.getItemAsync(TOKEN_KEY).then((stored) => {
-      if (stored) setToken(stored);
+      if (stored) {
+        setAuthToken(stored);
+        setToken(stored);
+      }
       setIsLoading(false);
     });
   }, []);
 
-  useEffect(() => {
-    setAuthToken(token);
-  }, [token]);
-
   async function login(email: string, password: string) {
     const res = await apiLogin(email, password);
     await SecureStore.setItemAsync(TOKEN_KEY, res.token);
+    setAuthToken(res.token);
     setToken(res.token);
     setUser(res.user);
   }
@@ -49,12 +49,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function register(email: string, password: string, name: string) {
     const res = await apiRegister(email, password, name);
     await SecureStore.setItemAsync(TOKEN_KEY, res.token);
+    setAuthToken(res.token);
     setToken(res.token);
     setUser(res.user);
   }
 
   async function logout() {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    setAuthToken(null);
     setToken(null);
     setUser(null);
   }
