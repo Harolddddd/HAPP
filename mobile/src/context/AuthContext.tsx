@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { login as apiLogin, register as apiRegister } from '../api/auth';
-import { setAuthToken } from '../api/client';
+import { setAuthToken, setUnauthorizedHandler } from '../api/client';
 
 interface User {
   id: string;
@@ -58,6 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(null);
     setUser(null);
   }
+
+  useEffect(() => {
+    setUnauthorizedHandler(logout);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>

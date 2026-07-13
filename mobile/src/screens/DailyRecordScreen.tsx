@@ -13,6 +13,14 @@ function toNumberOrUndefined(value: string): number | undefined {
   return Number.isNaN(n) ? undefined : n;
 }
 
+function todayLocalDate(): string {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function DailyRecordScreen({ navigation }: Props) {
   const [systolic, setSystolic] = useState('');
   const [diastolic, setDiastolic] = useState('');
@@ -44,7 +52,7 @@ export default function DailyRecordScreen({ navigation }: Props) {
 
     setSubmitting(true);
     try {
-      const recordDate = new Date().toISOString().slice(0, 10);
+      const recordDate = todayLocalDate();
       await saveDailyRecord({ recordDate, ...input });
       navigation.goBack();
     } catch (err) {

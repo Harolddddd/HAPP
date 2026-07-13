@@ -13,14 +13,19 @@ export default function HomeScreen({ navigation }: Props) {
 
   useEffect(() => {
     let active = true;
-    getProfile().then((profile) => {
-      if (!active) return;
-      if (!profile) {
-        navigation.replace('ProfileSetup');
-      } else {
+    getProfile()
+      .then((profile) => {
+        if (!active) return;
+        if (!profile) {
+          navigation.replace('ProfileSetup');
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => {
+        if (!active) return;
         setChecking(false);
-      }
-    });
+      });
     return () => {
       active = false;
     };

@@ -11,10 +11,14 @@ export default function TrendsScreen() {
   const [metric, setMetric] = useState<Metric>('bloodPressure');
 
   useEffect(() => {
-    getRecords(30).then((data) => {
-      setRecords(data);
-      setLoading(false);
-    });
+    getRecords(30)
+      .then((data) => {
+        setRecords(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
@@ -25,17 +29,24 @@ export default function TrendsScreen() {
     );
   }
 
-  const labels = records.map((r) => r.recordDate.slice(5, 10));
+  const filteredRecords =
+    metric === 'bloodPressure'
+      ? records.filter((r) => r.systolic != null && r.diastolic != null)
+      : metric === 'bloodGlucose'
+      ? records.filter((r) => r.bloodGlucose != null)
+      : records.filter((r) => r.weightKg != null);
+
+  const labels = filteredRecords.map((r) => r.recordDate.slice(5, 10));
 
   const datasets =
     metric === 'bloodPressure'
       ? [
-          { data: records.map((r) => r.systolic ?? 0), color: () => '#e74c3c' },
-          { data: records.map((r) => r.diastolic ?? 0), color: () => '#3498db' },
+          { data: filteredRecords.map((r) => r.systolic ?? 0), color: () => '#e74c3c' },
+          { data: filteredRecords.map((r) => r.diastolic ?? 0), color: () => '#3498db' },
         ]
       : metric === 'bloodGlucose'
-      ? [{ data: records.map((r) => r.bloodGlucose ?? 0), color: () => '#2ecc71' }]
-      : [{ data: records.map((r) => r.weightKg ?? 0), color: () => '#9b59b6' }];
+      ? [{ data: filteredRecords.map((r) => r.bloodGlucose ?? 0), color: () => '#2ecc71' }]
+      : [{ data: filteredRecords.map((r) => r.weightKg ?? 0), color: () => '#9b59b6' }];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -45,7 +56,7 @@ export default function TrendsScreen() {
         <Button title="血糖" onPress={() => setMetric('bloodGlucose')} />
         <Button title="体重" onPress={() => setMetric('weightKg')} />
       </View>
-      {records.length === 0 ? (
+      {filteredRecords.length === 0 ? (
         <Text style={styles.empty}>暂无数据</Text>
       ) : (
         <LineChart

@@ -7,10 +7,14 @@ export default function HistoryScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRecords(30).then((data) => {
-      setRecords([...data].reverse());
-      setLoading(false);
-    });
+    getRecords(30)
+      .then((data) => {
+        setRecords([...data].reverse());
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
