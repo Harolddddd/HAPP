@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth';
 import { profileRouter } from './routes/profile';
@@ -13,4 +13,9 @@ app.use('/records', recordsRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
+});
+
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
 });

@@ -2,18 +2,19 @@ import { Router } from 'express';
 import { prisma } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { calculateBmi } from '../utils/bmi';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const profileRouter = Router();
 
-profileRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
+profileRouter.get('/', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
   const profile = await prisma.healthProfile.findUnique({ where: { userId: req.userId! } });
   if (!profile) {
     return res.status(404).json({ error: 'Health profile not found' });
   }
   res.json({ ...profile, bmi: calculateBmi(profile.heightCm, profile.weightKg) });
-});
+}));
 
-profileRouter.put('/', requireAuth, async (req: AuthRequest, res) => {
+profileRouter.put('/', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
   const { age, gender, heightCm, weightKg, chronicConditions, medications, allergies } = req.body;
 
   if (
@@ -49,4 +50,4 @@ profileRouter.put('/', requireAuth, async (req: AuthRequest, res) => {
   });
 
   res.json({ ...profile, bmi: calculateBmi(profile.heightCm, profile.weightKg) });
-});
+}));

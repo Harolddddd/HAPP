@@ -2,10 +2,13 @@ import { Router } from 'express';
 import { prisma } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { validateDailyRecord } from '../utils/validators';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const recordsRouter = Router();
 
-recordsRouter.post('/', requireAuth, async (req: AuthRequest, res) => {
+const RECORD_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+recordsRouter.post('/', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
   const {
     recordDate,
     systolic,
@@ -20,6 +23,15 @@ recordsRouter.post('/', requireAuth, async (req: AuthRequest, res) => {
 
   if (!recordDate) {
     return res.status(400).json({ error: 'recordDate is required (YYYY-MM-DD)' });
+  }
+
+  if (typeof recordDate !== 'string' || !RECORD_DATE_RE.test(recordDate)) {
+    return res.status(400).json({ error: 'recordDate must be in YYYY-MM-DD format' });
+  }
+
+  const parsedDate = new Date(recordDate);
+  if (isNaN(parsedDate.getTime())) {
+    return res.status(400).json({ error: 'recordDate must be a valid date' });
   }
 
   const errors = validateDailyRecord({
@@ -39,15 +51,15 @@ recordsRouter.post('/', requireAuth, async (req: AuthRequest, res) => {
   const data = { systolic, diastolic, bloodGlucose, heartRate, weightKg, sleepHours, exerciseMinutes, waterMl };
 
   const record = await prisma.dailyRecord.upsert({
-    where: { userId_recordDate: { userId: req.userId!, recordDate: new Date(recordDate) } },
+    where: { userId_recordDate: { userId: req.userId!, recordDate: parsedDate } },
     update: data,
-    create: { userId: req.userId!, recordDate: new Date(recordDate), ...data },
+    create: { userId: req.userId!, recordDate: parsedDate, ...data },
   });
 
   res.status(200).json(record);
-});
+}));
 
-recordsRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
+recordsRouter.get('/', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
   const days = req.query.days ? Number(req.query.days) : 30;
   const since = new Date();
   since.setDate(since.getDate() - days);
@@ -58,4 +70,4 @@ recordsRouter.get('/', requireAuth, async (req: AuthRequest, res) => {
   });
 
   res.json(records);
-});
+}));

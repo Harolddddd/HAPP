@@ -33,6 +33,15 @@ describe('POST /records', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects an invalid recordDate with 400', async () => {
+    const res = await request(app)
+      .post('/records')
+      .set('Authorization', authHeader())
+      .send({ recordDate: 'not-a-date', systolic: 120 });
+
+    expect(res.status).toBe(400);
+  });
+
   it('rejects out-of-range values with 400', async () => {
     const res = await request(app)
       .post('/records')
