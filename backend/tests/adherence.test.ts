@@ -47,4 +47,19 @@ describe('calculateAdherence', () => {
     expect(result.currentStreak).toBe(2);
     expect(result.completedDays).toBe(3);
   });
+
+  it('calculates a fractional completionRate for partial adherence', () => {
+    const dates = Array.from({ length: 26 }, (_, i) => dateNDaysBefore(today, i));
+    const result = calculateAdherence(dates, today);
+    expect(result.completedDays).toBe(26);
+    expect(result.missedDays).toBe(4);
+    expect(result.completionRate).toBe(0.87);
+  });
+
+  it('excludes records outside the 30-day window boundary', () => {
+    const dates = [dateNDaysBefore(today, 30), dateNDaysBefore(today, 0)];
+    const result = calculateAdherence(dates, today);
+    expect(result.completedDays).toBe(1);
+    expect(result.missedDays).toBe(29);
+  });
 });
