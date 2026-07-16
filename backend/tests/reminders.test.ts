@@ -95,6 +95,15 @@ describe('POST /reminders', () => {
 
     expect(res.status).toBe(400);
   });
+
+  it('rejects non-integer weekdays with 400', async () => {
+    const res = await request(app)
+      .post('/reminders')
+      .set('Authorization', authHeader())
+      .send({ type: 'blood_pressure', time: '09:00', weekdays: [1, 2.5] });
+
+    expect(res.status).toBe(400);
+  });
 });
 
 describe('PUT /reminders/:id', () => {

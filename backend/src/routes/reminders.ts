@@ -22,7 +22,7 @@ function validateReminderInput(body: any): string[] {
   if (
     !Array.isArray(body.weekdays) ||
     body.weekdays.length === 0 ||
-    !body.weekdays.every((w: unknown) => typeof w === 'number' && w >= 0 && w <= 6)
+    !body.weekdays.every((w: unknown) => Number.isInteger(w) && (w as number) >= 0 && (w as number) <= 6)
   ) {
     errors.push('weekdays must be a non-empty array of integers between 0 and 6');
   }
