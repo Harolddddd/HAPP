@@ -13,6 +13,14 @@ enum Role {
   admin
 }
 
+enum ReminderType {
+  blood_pressure
+  medication
+  exercise
+  blood_glucose
+  custom
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -23,6 +31,7 @@ model User {
 
   healthProfile HealthProfile?
   dailyRecords  DailyRecord[]
+  reminders     Reminder[]
 }
 
 model HealthProfile {
@@ -56,4 +65,17 @@ model DailyRecord {
   updatedAt       DateTime @updatedAt
 
   @@unique([userId, recordDate])
+}
+
+model Reminder {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  type      ReminderType
+  title     String
+  time      String
+  weekdays  Int[]
+  enabled   Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
