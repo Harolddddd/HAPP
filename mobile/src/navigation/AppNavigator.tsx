@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { useAuth } from '../context/AuthContext';
 import type { RootStackParamList } from './types';
+import { navigationRef, navigateToDailyRecord } from './navigationRef';
+import { getReminders } from '../api/reminders';
+import { scheduleReminderNotifications, cancelReminderNotifications } from '../utils/notifications';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ProfileSetupScreen from '../screens/ProfileSetupScreen';
@@ -11,11 +15,36 @@ import HomeScreen from '../screens/HomeScreen';
 import DailyRecordScreen from '../screens/DailyRecordScreen';
 import HistoryScreen from '../screens/HistoryScreen';
 import TrendsScreen from '../screens/TrendsScreen';
+import RemindersScreen from '../screens/RemindersScreen';
+import ReminderFormScreen from '../screens/ReminderFormScreen';
+import AdherenceScreen from '../screens/AdherenceScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   const { token, isLoading } = useAuth();
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(() => {
+      navigateToDailyRecord();
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    getReminders()
+      .then((reminders) => {
+        reminders.forEach((reminder) => {
+          if (reminder.enabled) {
+            scheduleReminderNotifications(reminder).catch(() => {});
+          } else {
+            cancelReminderNotifications(reminder.id).catch(() => {});
+          }
+        });
+      })
+      .catch(() => {});
+  }, [token]);
 
   if (isLoading) {
     return (
@@ -26,7 +55,7 @@ export default function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {token ? (
           <>
@@ -35,6 +64,9 @@ export default function AppNavigator() {
             <Stack.Screen name="DailyRecord" component={DailyRecordScreen} options={{ title: '今日记录' }} />
             <Stack.Screen name="History" component={HistoryScreen} options={{ title: '历史记录' }} />
             <Stack.Screen name="Trends" component={TrendsScreen} options={{ title: '趋势图' }} />
+            <Stack.Screen name="Reminders" component={RemindersScreen} options={{ title: '健康提醒' }} />
+            <Stack.Screen name="ReminderForm" component={ReminderFormScreen} options={{ title: '编辑提醒' }} />
+            <Stack.Screen name="Adherence" component={AdherenceScreen} options={{ title: '依从性分析' }} />
           </>
         ) : (
           <>

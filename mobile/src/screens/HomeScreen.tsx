@@ -45,6 +45,8 @@ export default function HomeScreen({ navigation }: Props) {
       <Button title="今日记录" onPress={() => navigation.navigate('DailyRecord')} />
       <Button title="历史记录" onPress={() => navigation.navigate('History')} />
       <Button title="趋势图" onPress={() => navigation.navigate('Trends')} />
+      <Button title="健康提醒" onPress={() => navigation.navigate('Reminders')} />
+      <Button title="依从性分析" onPress={() => navigation.navigate('Adherence')} />
       <Button title="编辑健康档案" onPress={() => navigation.navigate('ProfileSetup')} />
       <Button title="退出登录" color="#c0392b" onPress={() => logout()} />
     </View>
