@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { saveDailyRecord } from '../api/records';
 import { validateDailyRecord } from '../utils/validators';
+import { todayLocalDate } from '../utils/date';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyRecord'>;
 
@@ -11,14 +12,6 @@ function toNumberOrUndefined(value: string): number | undefined {
   if (value.trim() === '') return undefined;
   const n = Number(value);
   return Number.isNaN(n) ? undefined : n;
-}
-
-function todayLocalDate(): string {
-  const d = new Date();
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }
 
 export default function DailyRecordScreen({ navigation }: Props) {
