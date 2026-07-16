@@ -71,4 +71,16 @@ describe('GET /adherence', () => {
     expect(res.status).toBe(200);
     expect(res.body.completedDays).toBe(0);
   });
+
+  it('falls back to the server date when today has an invalid month', async () => {
+    mockedPrisma.dailyRecord.findMany.mockResolvedValue([]);
+
+    const res = await request(app)
+      .get('/adherence')
+      .query({ today: '2026-13-45' })
+      .set('Authorization', authHeader());
+
+    expect(res.status).toBe(200);
+    expect(res.body.completedDays).toBe(0);
+  });
 });

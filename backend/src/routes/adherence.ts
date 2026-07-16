@@ -8,12 +8,18 @@ export const adherenceRouter = Router();
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+function isValidDateKey(value: string): boolean {
+  if (!DATE_RE.test(value)) return false;
+  const parsed = new Date(value);
+  return !isNaN(parsed.getTime());
+}
+
 adherenceRouter.get(
   '/',
   requireAuth,
   asyncHandler(async (req: AuthRequest, res) => {
     const todayParam = typeof req.query.today === 'string' ? req.query.today : undefined;
-    const todayKey = todayParam && DATE_RE.test(todayParam) ? todayParam : new Date().toISOString().slice(0, 10);
+    const todayKey = todayParam && isValidDateKey(todayParam) ? todayParam : new Date().toISOString().slice(0, 10);
 
     const since = new Date(todayKey);
     since.setUTCDate(since.getUTCDate() - 29);
