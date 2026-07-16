@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Touchable
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { createReminder, updateReminder, getReminders, Reminder } from '../api/reminders';
-import { requestNotificationPermission, scheduleReminderNotifications } from '../utils/notifications';
+import { requestNotificationPermission, scheduleReminderNotifications, cancelReminderNotifications } from '../utils/notifications';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ReminderForm'>;
 
@@ -75,7 +75,11 @@ export default function ReminderFormScreen({ navigation, route }: Props) {
       await requestNotificationPermission();
       const input = { type, title, time, weekdays };
       const saved = reminderId ? await updateReminder(reminderId, input) : await createReminder(input);
-      await scheduleReminderNotifications(saved);
+      if (saved.enabled) {
+        await scheduleReminderNotifications(saved);
+      } else {
+        await cancelReminderNotifications(saved.id);
+      }
       navigation.goBack();
     } catch (err) {
       Alert.alert('保存失败', '请稍后重试');
