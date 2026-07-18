@@ -37,8 +37,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const me = await apiGetMe();
           setUser(me);
         } catch {
-          // token invalid/expired — the response interceptor's unauthorized
-          // handler will log out on the next request that hits a 401
+          // getMe() can fail for reasons other than an expired/invalid token
+          // (network unreachable, timeout, 500, ...) — the 401 interceptor's
+          // unauthorizedHandler only fires on an actual 401 response, so it
+          // won't rescue us here. Clear the restored session locally so the
+          // app falls through to the Login screen instead of getting stuck
+          // on the (token && !user) loading guard in AppNavigator forever.
+          await SecureStore.deleteItemAsync(TOKEN_KEY);
+          setAuthToken(null);
+          setToken(null);
         }
       }
       setIsLoading(false);
