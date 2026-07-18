@@ -9,4 +9,6 @@ export type RootStackParamList = {
   Reminders: undefined;
   ReminderForm: { reminderId?: string };
   Adherence: undefined;
+  DoctorPatientList: undefined;
+  DoctorPatientDetail: { patientId: string; patientName: string };
 };

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { login as apiLogin, register as apiRegister } from '../api/auth';
+import { login as apiLogin, register as apiRegister, getMe as apiGetMe, UserRole } from '../api/auth';
 import { setAuthToken, setUnauthorizedHandler } from '../api/client';
 
 interface User {
@@ -15,7 +15,7 @@ interface AuthContextValue {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -29,10 +29,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    SecureStore.getItemAsync(TOKEN_KEY).then((stored) => {
+    SecureStore.getItemAsync(TOKEN_KEY).then(async (stored) => {
       if (stored) {
         setAuthToken(stored);
         setToken(stored);
+        try {
+          const me = await apiGetMe();
+          setUser(me);
+        } catch {
+          // token invalid/expired — the response interceptor's unauthorized
+          // handler will log out on the next request that hits a 401
+        }
       }
       setIsLoading(false);
     });
@@ -46,8 +53,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(res.user);
   }
 
-  async function register(email: string, password: string, name: string) {
-    const res = await apiRegister(email, password, name);
+  async function register(email: string, password: string, name: string, role: UserRole = 'patient') {
+    const res = await apiRegister(email, password, name, role);
     await SecureStore.setItemAsync(TOKEN_KEY, res.token);
     setAuthToken(res.token);
     setToken(res.token);
