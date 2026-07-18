@@ -18,11 +18,13 @@ import TrendsScreen from '../screens/TrendsScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import ReminderFormScreen from '../screens/ReminderFormScreen';
 import AdherenceScreen from '../screens/AdherenceScreen';
+import DoctorPatientListScreen from '../screens/DoctorPatientListScreen';
+import DoctorPatientDetailScreen from '../screens/DoctorPatientDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
-  const { token, isLoading } = useAuth();
+  const { token, isLoading, user } = useAuth();
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(() => {
@@ -32,7 +34,7 @@ export default function AppNavigator() {
   }, []);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || user?.role !== 'patient') return;
     getReminders()
       .then((reminders) => {
         reminders.forEach((reminder) => {
@@ -44,9 +46,9 @@ export default function AppNavigator() {
         });
       })
       .catch(() => {});
-  }, [token]);
+  }, [token, user]);
 
-  if (isLoading) {
+  if (isLoading || (token && !user)) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -57,7 +59,16 @@ export default function AppNavigator() {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
-        {token ? (
+        {token && user?.role === 'doctor' ? (
+          <>
+            <Stack.Screen name="DoctorPatientList" component={DoctorPatientListScreen} options={{ title: '患者列表' }} />
+            <Stack.Screen
+              name="DoctorPatientDetail"
+              component={DoctorPatientDetailScreen}
+              options={{ title: '患者详情' }}
+            />
+          </>
+        ) : token ? (
           <>
             <Stack.Screen name="Home" component={HomeScreen} options={{ title: '首页' }} />
             <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} options={{ title: '健康档案' }} />
