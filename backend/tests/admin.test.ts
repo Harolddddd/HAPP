@@ -65,4 +65,13 @@ describe('GET /admin/stats', () => {
       })
     );
   });
+
+  it('queries the top-features event set without a role filter', async () => {
+    mockedPrisma.usageEvent.findMany.mockResolvedValue([]);
+
+    await request(app).get('/admin/stats').set('Authorization', authHeader());
+
+    const secondCallArgs = mockedPrisma.usageEvent.findMany.mock.calls[1][0];
+    expect(secondCallArgs.where.user).toBeUndefined();
+  });
 });
