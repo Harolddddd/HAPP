@@ -8,6 +8,7 @@ import type { RootStackParamList } from './types';
 import { navigationRef, navigateToDailyRecord } from './navigationRef';
 import { getReminders } from '../api/reminders';
 import { scheduleReminderNotifications, cancelReminderNotifications } from '../utils/notifications';
+import { logUsageEvent } from '../api/usage';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ProfileSetupScreen from '../screens/ProfileSetupScreen';
@@ -20,6 +21,7 @@ import ReminderFormScreen from '../screens/ReminderFormScreen';
 import AdherenceScreen from '../screens/AdherenceScreen';
 import DoctorPatientListScreen from '../screens/DoctorPatientListScreen';
 import DoctorPatientDetailScreen from '../screens/DoctorPatientDetailScreen';
+import AdminStatsScreen from '../screens/AdminStatsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -57,7 +59,16 @@ export default function AppNavigator() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      ref={navigationRef}
+      onStateChange={() => {
+        if (!token) return;
+        const routeName = navigationRef.getCurrentRoute()?.name;
+        if (routeName) {
+          logUsageEvent(routeName);
+        }
+      }}
+    >
       <Stack.Navigator>
         {token && user?.role === 'doctor' ? (
           <>
@@ -68,6 +79,8 @@ export default function AppNavigator() {
               options={{ title: '患者详情' }}
             />
           </>
+        ) : token && user?.role === 'admin' ? (
+          <Stack.Screen name="AdminStats" component={AdminStatsScreen} options={{ title: '后台统计' }} />
         ) : token ? (
           <>
             <Stack.Screen name="Home" component={HomeScreen} options={{ title: '首页' }} />
