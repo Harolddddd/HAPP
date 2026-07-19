@@ -32,6 +32,7 @@ model User {
   healthProfile HealthProfile?
   dailyRecords  DailyRecord[]
   reminders     Reminder[]
+  usageEvents   UsageEvent[]
 }
 
 model HealthProfile {
@@ -78,4 +79,12 @@ model Reminder {
   enabled   Boolean      @default(true)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+}
+
+model UsageEvent {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  screen    String
+  createdAt DateTime @default(now())
 }
