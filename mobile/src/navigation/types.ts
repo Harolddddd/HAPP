@@ -11,4 +11,5 @@ export type RootStackParamList = {
   Adherence: undefined;
   DoctorPatientList: undefined;
   DoctorPatientDetail: { patientId: string; patientName: string };
+  AdminStats: undefined;
 };
