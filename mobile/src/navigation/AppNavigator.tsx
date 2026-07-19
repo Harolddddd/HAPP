@@ -58,17 +58,16 @@ export default function AppNavigator() {
     );
   }
 
+  function logCurrentRoute() {
+    if (!token) return;
+    const routeName = navigationRef.getCurrentRoute()?.name;
+    if (routeName) {
+      logUsageEvent(routeName);
+    }
+  }
+
   return (
-    <NavigationContainer
-      ref={navigationRef}
-      onStateChange={() => {
-        if (!token) return;
-        const routeName = navigationRef.getCurrentRoute()?.name;
-        if (routeName) {
-          logUsageEvent(routeName);
-        }
-      }}
-    >
+    <NavigationContainer ref={navigationRef} onReady={logCurrentRoute} onStateChange={logCurrentRoute}>
       <Stack.Navigator>
         {token && user?.role === 'doctor' ? (
           <>
