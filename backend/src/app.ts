@@ -7,6 +7,7 @@ import { remindersRouter } from './routes/reminders';
 import { adherenceRouter } from './routes/adherence';
 import { doctorRouter } from './routes/doctor';
 import { usageEventsRouter } from './routes/usageEvents';
+import { adminRouter } from './routes/admin';
 
 export const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.use('/reminders', remindersRouter);
 app.use('/adherence', adherenceRouter);
 app.use('/doctor', doctorRouter);
 app.use('/usage-events', usageEventsRouter);
+app.use('/admin', adminRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
