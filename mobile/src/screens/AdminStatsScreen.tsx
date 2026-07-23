@@ -26,11 +26,16 @@ export default function AdminStatsScreen() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  function loadStats() {
+    setLoading(true);
     getAdminStats()
       .then(setStats)
       .catch(() => setStats(null))
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadStats();
   }, []);
 
   if (loading) {
@@ -45,6 +50,8 @@ export default function AdminStatsScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.empty}>加载失败，请稍后重试</Text>
+        <Button title="重试" onPress={loadStats} />
+        <Button title="退出登录" color="#c0392b" onPress={() => logout()} />
       </View>
     );
   }
