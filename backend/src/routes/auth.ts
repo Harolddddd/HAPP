@@ -4,12 +4,13 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { asyncHandler } from '../utils/asyncHandler';
+import { authRateLimiter } from '../middleware/rateLimit';
 
 export const authRouter = Router();
 
 const VALID_ROLES = ['patient', 'doctor'];
 
-authRouter.post('/register', asyncHandler(async (req, res) => {
+authRouter.post('/register', authRateLimiter, asyncHandler(async (req, res) => {
   const { email, password, name, role } = req.body;
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'email, password and name are required' });
@@ -32,7 +33,7 @@ authRouter.post('/register', asyncHandler(async (req, res) => {
   res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
 }));
 
-authRouter.post('/login', asyncHandler(async (req, res) => {
+authRouter.post('/login', authRateLimiter, asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'email and password are required' });
