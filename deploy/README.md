@@ -26,9 +26,11 @@ cd happ/backend
 npm install
 npm run build
 
+JWT_SECRET="$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
+
 cat > .env <<EOF
 DATABASE_URL="postgresql://happ_app:<HAPP_DB_PASSWORD>@localhost:5432/happ?schema=public"
-JWT_SECRET="<generate a new random value, e.g. node -e "console.log(require('crypto').randomBytes(32).toString('hex'))">"
+JWT_SECRET="${JWT_SECRET}"
 PORT=3000
 CORS_ORIGIN="https://app.<domain>"
 EOF
