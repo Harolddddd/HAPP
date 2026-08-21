@@ -14,15 +14,19 @@
 ## Server bootstrap (run once, on the VPS)
 
 ```bash
+apt-get update && apt-get install -y git
+mkdir -p /var/www
+cd /var/www
+git clone https://github.com/Harolddddd/HAPP.git happ
+cd happ
+
 HAPP_DB_PASSWORD='<choose a real password>' ./deploy/setup-server.sh
 ```
 
 ## Deploy the backend
 
 ```bash
-cd /var/www
-git clone https://github.com/Harolddddd/HAPP.git happ
-cd happ/backend
+cd /var/www/happ/backend
 npm install
 npm run build
 
@@ -42,6 +46,10 @@ pm2 save
 pm2 startup
 ```
 
+`pm2 startup` only *prints* a `sudo env PATH=... pm2 startup ...` command — copy
+that printed command and run it as a separate step, otherwise the systemd unit
+is never registered and pm2 will not restart the backend after a reboot.
+
 ## Set up daily backups
 
 ```bash
@@ -53,6 +61,7 @@ chmod +x /var/www/happ/deploy/backup-db.sh
 
 ```bash
 cd /var/www/happ/mobile
+npm install
 EXPO_PUBLIC_API_BASE_URL="https://api.<domain>" npx expo export --platform web
 mkdir -p /var/www/happ/mobile-web
 cp -r dist/* /var/www/happ/mobile-web/
@@ -78,6 +87,33 @@ certbot --nginx -d app.<domain> -d api.<domain>
 2. Register a real account through the public flow, log in.
 3. Confirm `GET https://api.<domain>/health` returns `{"status":"ok"}`.
 4. Confirm a non-admin token gets 403 from `https://api.<domain>/admin/stats`.
+5. Confirm the exported web bundle really points at the production API — run
+   from `/var/www/happ/mobile`:
+
+   ```bash
+   grep -rl "api.<domain>" dist/_expo | head -1
+   ```
+
+   Expected: a file path. Empty output means `EXPO_PUBLIC_API_BASE_URL` was
+   missed at export time, so the bundle still calls the hardcoded LAN dev IP
+   (`http://192.168.1.125:3000`) — which an HTTPS page blocks as mixed content,
+   with nothing failing server-side to make it obvious. Re-export with the env
+   var set and re-copy to `/var/www/happ/mobile-web/`.
+6. Confirm CORS rejects a bogus origin:
+
+   ```bash
+   curl -sI -H "Origin: https://evil.example.com" https://api.<domain>/health | grep -i access-control
+   ```
+
+   Expected: no output at all — the response must carry no
+   `Access-Control-Allow-Origin` header.
+7. Confirm CORS still allows the real app origin:
+
+   ```bash
+   curl -sI -H "Origin: https://app.<domain>" https://api.<domain>/health | grep -i access-control
+   ```
+
+   Expected: `access-control-allow-origin: https://app.<domain>`.
 
 ## Future code changes
 
