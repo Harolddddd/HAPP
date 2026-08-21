@@ -10,6 +10,16 @@ import { usageEventsRouter } from './routes/usageEvents';
 import { adminRouter } from './routes/admin';
 
 export const app = express();
+
+// In production this app runs behind the Nginx reverse proxy in
+// deploy/nginx-api.conf, which always connects from localhost. Without this,
+// Express reports the proxy's own loopback address as `req.ip` for every
+// request and express-rate-limit's per-IP auth limiter collapses into a single
+// global bucket for the whole internet. Deliberately 'loopback' rather than
+// `true`: a permissive setting would let any client spoof X-Forwarded-For and
+// bypass the limiter entirely.
+app.set('trust proxy', 'loopback');
+
 const corsOrigins = process.env.CORS_ORIGIN?.split(',').map((o) => o.trim());
 app.use(cors(corsOrigins ? { origin: corsOrigins } : { origin: true }));
 app.use(express.json());
