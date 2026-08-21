@@ -32,10 +32,13 @@ simultaneous processes — keep both terminals open.
 2. Postgres itself must already be installed, running, and have a `happ`
    database created (`CREATE DATABASE happ;`) before `prisma migrate deploy`
    will succeed — it doesn't set up Postgres for you.
-3. `API_BASE_URL` in `client.ts` is your phone's route back to this laptop.
-   It must be this machine's *current* LAN IP (`ipconfig` → IPv4), so it
-   changes every time you change networks or switch machines — there's no
-   way to make this one portable.
+3. `API_BASE_URL` in `client.ts` falls back to a hardcoded LAN IP for Expo
+   Go dev — it must be this machine's *current* LAN IP (`ipconfig` →
+   IPv4), so it changes every time you change networks or switch machines.
+   For a web build (`expo export --platform web`), set the
+   `EXPO_PUBLIC_API_BASE_URL` env var instead (e.g.
+   `EXPO_PUBLIC_API_BASE_URL="https://api.example.com" npx expo export --platform web`)
+   — see `deploy/README.md` for the full production build flow.
 4. Windows Firewall will silently block the phone from reaching the backend
    unless you add an inbound rule for port 3000.
 
@@ -79,11 +82,16 @@ git and must be recreated locally on each machine:
    cd ../mobile
    npm install
    ```
-   Edit `mobile/src/api/client.ts` and set `API_BASE_URL` to this machine's
-   LAN IP (`ipconfig` → IPv4 Address), e.g. `http://192.168.1.20:3000`. This
-   file is intentionally gitignored-in-spirit (tracked, but the LAN IP line is
-   expected to differ per machine and per network) — don't commit your local
-   IP.
+   For Expo Go dev, edit the `LAN_DEV_API_BASE_URL` fallback in
+   `mobile/src/api/client.ts` to this machine's LAN IP (`ipconfig` → IPv4
+   Address), e.g. `http://192.168.1.20:3000`. This file is intentionally
+   gitignored-in-spirit (tracked, but the LAN IP line is expected to differ
+   per machine and per network) — don't commit your local IP.
+
+   For a production web build instead, leave that fallback alone and set
+   `EXPO_PUBLIC_API_BASE_URL` when running `expo export --platform web` (see
+   `deploy/README.md`) — the app picks it up automatically via
+   `resolveApiBaseUrl()`, no code edit needed.
 
 5. **Windows Firewall**: allow inbound connections on port 3000 so your phone
    (on the same WiFi) can reach the backend.

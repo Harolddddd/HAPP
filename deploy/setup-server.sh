@@ -22,9 +22,21 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 ufw --force enable
 
-sudo -u postgres psql -c "CREATE DATABASE happ;"
-sudo -u postgres psql -c "CREATE USER happ_app WITH PASSWORD '${HAPP_DB_PASSWORD}';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE happ TO happ_app;"
+# Idempotent (safe to re-run) and keeps HAPP_DB_PASSWORD out of argv/ps by
+# passing it through psql's stdin instead of a -c command-line argument.
+sudo -u postgres psql <<EOSQL
+SELECT 'CREATE DATABASE happ' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'happ')\gexec
+DO \$\$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'happ_app') THEN
+    CREATE ROLE happ_app WITH LOGIN PASSWORD '${HAPP_DB_PASSWORD}';
+  ELSE
+    ALTER ROLE happ_app WITH PASSWORD '${HAPP_DB_PASSWORD}';
+  END IF;
+END
+\$\$;
+GRANT ALL PRIVILEGES ON DATABASE happ TO happ_app;
+EOSQL
 
 apt-get install -y certbot python3-certbot-nginx
 

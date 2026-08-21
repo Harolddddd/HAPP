@@ -5,7 +5,7 @@ export const AUTH_RATE_LIMIT_MAX = 20;
 
 export const authRateLimiter = rateLimit({
   windowMs: AUTH_RATE_LIMIT_WINDOW_MS,
-  max: AUTH_RATE_LIMIT_MAX,
+  limit: AUTH_RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' },

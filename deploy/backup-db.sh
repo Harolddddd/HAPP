@@ -7,6 +7,7 @@ set -euo pipefail
 
 BACKUP_DIR="/var/backups/happ"
 mkdir -p "$BACKUP_DIR"
+chmod 700 "$BACKUP_DIR"
 
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 sudo -u postgres pg_dump happ > "$BACKUP_DIR/happ-$TIMESTAMP.sql"
