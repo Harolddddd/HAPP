@@ -1,0 +1,20 @@
+{
+  "short_name": "HAPP",
+  "name": "HAPP",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#E6F4FE",
+  "background_color": "#E6F4FE"
+}

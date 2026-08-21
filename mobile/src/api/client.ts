@@ -1,8 +1,15 @@
 import axios from 'axios';
 
-// Point this at your backend's LAN address when testing on a physical device,
-// e.g. http://192.168.1.20:3000
-export const API_BASE_URL = 'http://localhost:3000';
+// Falls back to this machine's LAN address for Expo Go dev. For the public
+// web build, set EXPO_PUBLIC_API_BASE_URL when running `expo export` —
+// see deploy/README.md.
+const LAN_DEV_API_BASE_URL = 'http://192.168.1.125:3000';
+
+export function resolveApiBaseUrl(envValue: string | undefined): string {
+  return envValue && envValue.length > 0 ? envValue : LAN_DEV_API_BASE_URL;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl(process.env.EXPO_PUBLIC_API_BASE_URL);
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
