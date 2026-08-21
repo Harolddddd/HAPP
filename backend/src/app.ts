@@ -10,7 +10,8 @@ import { usageEventsRouter } from './routes/usageEvents';
 import { adminRouter } from './routes/admin';
 
 export const app = express();
-app.use(cors());
+const corsOrigins = process.env.CORS_ORIGIN?.split(',').map((o) => o.trim());
+app.use(cors(corsOrigins ? { origin: corsOrigins } : { origin: true }));
 app.use(express.json());
 app.use('/auth', authRouter);
 app.use('/profile', profileRouter);
