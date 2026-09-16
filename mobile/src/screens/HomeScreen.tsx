@@ -7,11 +7,12 @@ import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-export default function HomeScreen({ navigation }: Props) {
+export default function HomeScreen({ navigation, route }: Props) {
   const { logout } = useAuth();
-  const [checking, setChecking] = useState(true);
+  const [checking, setChecking] = useState(!route.params?.skipProfileCheck);
 
   useEffect(() => {
+    if (route.params?.skipProfileCheck) return;
     let active = true;
     getProfile()
       .then((profile) => {
@@ -29,7 +30,7 @@ export default function HomeScreen({ navigation }: Props) {
     return () => {
       active = false;
     };
-  }, [navigation]);
+  }, [navigation, route.params?.skipProfileCheck]);
 
   if (checking) {
     return (
@@ -47,7 +48,6 @@ export default function HomeScreen({ navigation }: Props) {
       <Button title="趋势图" onPress={() => navigation.navigate('Trends')} />
       <Button title="健康提醒" onPress={() => navigation.navigate('Reminders')} />
       <Button title="依从性分析" onPress={() => navigation.navigate('Adherence')} />
-      <Button title="编辑健康档案" onPress={() => navigation.navigate('ProfileSetup')} />
       <Button title="退出登录" color="#c0392b" onPress={() => logout()} />
     </View>
   );

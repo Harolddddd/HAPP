@@ -2,7 +2,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   ProfileSetup: undefined;
-  Home: undefined;
+  Home: { skipProfileCheck?: boolean } | undefined;
   DailyRecord: undefined;
   History: undefined;
   Trends: undefined;

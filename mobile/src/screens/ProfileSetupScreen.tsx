@@ -22,12 +22,14 @@ export default function ProfileSetupScreen({ navigation }: Props) {
   const [allergies, setAllergies] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasExistingProfile, setHasExistingProfile] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
         const profile = await getProfile();
         if (profile) {
+          setHasExistingProfile(true);
           setAge(String(profile.age));
           setGender(profile.gender);
           setHeightCm(String(profile.heightCm));
@@ -172,6 +174,14 @@ export default function ProfileSetupScreen({ navigation }: Props) {
       <TextInput style={styles.input} placeholder="过敏史" value={allergies} onChangeText={setAllergies} />
       {error && <Text style={styles.error}>{error}</Text>}
       <Button title={submitting ? '保存中...' : '保存'} onPress={handleSubmit} disabled={submitting} />
+      {!hasExistingProfile && (
+        <TouchableOpacity
+          style={styles.skipButton}
+          onPress={() => navigation.replace('Home', { skipProfileCheck: true })}
+        >
+          <Text style={styles.skipText}>暂时跳过，以后再完善</Text>
+        </TouchableOpacity>
+      )}
     </ScrollView>
   );
 }
@@ -189,4 +199,6 @@ const styles = StyleSheet.create({
   chipSelected: { backgroundColor: '#3498db', borderColor: '#3498db' },
   chipText: { color: '#333' },
   chipTextSelected: { color: '#fff' },
+  skipButton: { marginTop: 16, alignItems: 'center', padding: 8 },
+  skipText: { color: '#3498db' },
 });
