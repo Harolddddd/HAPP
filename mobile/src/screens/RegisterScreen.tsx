@@ -9,7 +9,7 @@ import PasswordInput from '../components/PasswordInput';
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
 const ROLES: { value: UserRole; label: string }[] = [
-  { value: 'patient', label: '患者' },
+  { value: 'patient', label: '用户' },
   { value: 'doctor', label: '医生' },
 ];
 

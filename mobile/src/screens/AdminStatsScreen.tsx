@@ -12,8 +12,8 @@ const SCREEN_LABELS: Record<string, string> = {
   Reminders: '健康提醒',
   ReminderForm: '编辑提醒',
   Adherence: '依从性分析',
-  DoctorPatientList: '患者列表',
-  DoctorPatientDetail: '患者详情',
+  DoctorPatientList: '用户列表',
+  DoctorPatientDetail: '用户详情',
   AdminStats: '后台统计',
 };
 

@@ -71,11 +71,11 @@ export default function AppNavigator() {
       <Stack.Navigator>
         {token && user?.role === 'doctor' ? (
           <>
-            <Stack.Screen name="DoctorPatientList" component={DoctorPatientListScreen} options={{ title: '患者列表' }} />
+            <Stack.Screen name="DoctorPatientList" component={DoctorPatientListScreen} options={{ title: '用户列表' }} />
             <Stack.Screen
               name="DoctorPatientDetail"
               component={DoctorPatientDetailScreen}
-              options={{ title: '患者详情' }}
+              options={{ title: '用户详情' }}
             />
           </>
         ) : token && user?.role === 'admin' ? (
