@@ -4,6 +4,9 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { getProfile, saveProfile } from '../api/profile';
 import { calculateBmi } from '../utils/bmi';
+import { useAuth } from '../context/AuthContext';
+import { setProfileSetupSkipped } from '../utils/profileSkip';
+import PersonAvatar from '../components/PersonAvatar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProfileSetup'>;
 
@@ -11,7 +14,9 @@ const GENDER_OPTIONS = ['男', '女'];
 const CHRONIC_OPTIONS = ['无', '高血压', '糖尿病', '高血脂', '心脏病', '其他'];
 
 export default function ProfileSetupScreen({ navigation }: Props) {
+  const { user, updateName } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [name, setName] = useState(user?.name ?? '');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
   const [heightCm, setHeightCm] = useState('');
@@ -65,6 +70,7 @@ export default function ProfileSetupScreen({ navigation }: Props) {
 
   async function handleSubmit() {
     const missing: string[] = [];
+    if (!name) missing.push('姓名');
     if (!age) missing.push('年龄');
     if (!gender) missing.push('性别');
     if (!heightNum) missing.push('身高');
@@ -85,6 +91,9 @@ export default function ProfileSetupScreen({ navigation }: Props) {
               ? otherCondition.split(',').map((s) => s.trim()).filter(Boolean)
               : []),
           ];
+      if (name !== user?.name) {
+        await updateName(name);
+      }
       await saveProfile({
         age: parseInt(age, 10),
         gender,
@@ -102,6 +111,11 @@ export default function ProfileSetupScreen({ navigation }: Props) {
     }
   }
 
+  async function handleSkip() {
+    await setProfileSetupSkipped();
+    navigation.replace('Home');
+  }
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -113,6 +127,8 @@ export default function ProfileSetupScreen({ navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>健康档案</Text>
+      <PersonAvatar />
+      <TextInput style={styles.input} placeholder="姓名" maxLength={20} value={name} onChangeText={setName} />
       <TextInput style={styles.input} placeholder="年龄" keyboardType="numeric" value={age} onChangeText={setAge} />
 
       <Text style={styles.label}>性别</Text>
@@ -165,20 +181,12 @@ export default function ProfileSetupScreen({ navigation }: Props) {
         />
       )}
 
-      <TextInput
-        style={styles.input}
-        placeholder="正在服用药物（逗号分隔）"
-        value={medications}
-        onChangeText={setMedications}
-      />
+      <TextInput style={styles.input} placeholder="正在服用药物" value={medications} onChangeText={setMedications} />
       <TextInput style={styles.input} placeholder="过敏史" value={allergies} onChangeText={setAllergies} />
       {error && <Text style={styles.error}>{error}</Text>}
       <Button title={submitting ? '保存中...' : '保存'} onPress={handleSubmit} disabled={submitting} />
       {!hasExistingProfile && (
-        <TouchableOpacity
-          style={styles.skipButton}
-          onPress={() => navigation.replace('Home', { skipProfileCheck: true })}
-        >
+        <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
           <Text style={styles.skipText}>暂时跳过，以后再完善</Text>
         </TouchableOpacity>
       )}

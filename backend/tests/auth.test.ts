@@ -9,12 +9,13 @@ jest.mock('../src/db', () => ({
     user: {
       findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
     },
   },
 }));
 
 const mockedPrisma = prisma as unknown as {
-  user: { findUnique: jest.Mock; create: jest.Mock };
+  user: { findUnique: jest.Mock; create: jest.Mock; update: jest.Mock };
 };
 
 describe('POST /auth/register', () => {
@@ -176,5 +177,52 @@ describe('GET /auth/me', () => {
     const res = await request(app).get('/auth/me').set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(404);
+  });
+});
+
+describe('PATCH /auth/me', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('returns 401 without a token', async () => {
+    const res = await request(app).patch('/auth/me').send({ name: 'New Name' });
+    expect(res.status).toBe(401);
+  });
+
+  it('rejects an empty name with 400', async () => {
+    const token = jwt.sign({ userId: 'user-1', role: 'patient' }, process.env.JWT_SECRET || 'dev-secret');
+    const res = await request(app).patch('/auth/me').set('Authorization', `Bearer ${token}`).send({ name: '' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a name over 20 characters with 400', async () => {
+    const token = jwt.sign({ userId: 'user-1', role: 'patient' }, process.env.JWT_SECRET || 'dev-secret');
+    const res = await request(app)
+      .patch('/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'a'.repeat(21) });
+    expect(res.status).toBe(400);
+  });
+
+  it('updates the name and returns the updated user', async () => {
+    mockedPrisma.user.update.mockResolvedValue({
+      id: 'user-1',
+      email: 'a@example.com',
+      name: 'New Name',
+      role: 'patient',
+      passwordHash: 'hashed',
+    });
+
+    const token = jwt.sign({ userId: 'user-1', role: 'patient' }, process.env.JWT_SECRET || 'dev-secret');
+    const res = await request(app)
+      .patch('/auth/me')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'New Name' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ id: 'user-1', email: 'a@example.com', name: 'New Name', role: 'patient' });
+    expect(mockedPrisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      data: { name: 'New Name' },
+    });
   });
 });

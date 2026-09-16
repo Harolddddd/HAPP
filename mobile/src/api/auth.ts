@@ -26,3 +26,8 @@ export async function getMe(): Promise<AuthResponse['user']> {
   const res = await apiClient.get<AuthResponse['user']>('/auth/me');
   return res.data;
 }
+
+export async function updateName(name: string): Promise<AuthResponse['user']> {
+  const res = await apiClient.patch<AuthResponse['user']>('/auth/me', { name });
+  return res.data;
+}

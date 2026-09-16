@@ -3,34 +3,39 @@ import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { getProfile } from '../api/profile';
+import { getProfileSetupSkipped } from '../utils/profileSkip';
 import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-export default function HomeScreen({ navigation, route }: Props) {
+export default function HomeScreen({ navigation }: Props) {
   const { logout } = useAuth();
-  const [checking, setChecking] = useState(!route.params?.skipProfileCheck);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (route.params?.skipProfileCheck) return;
     let active = true;
-    getProfile()
-      .then((profile) => {
+    (async () => {
+      const skipped = await getProfileSetupSkipped();
+      if (skipped) {
+        if (active) setChecking(false);
+        return;
+      }
+      try {
+        const profile = await getProfile();
         if (!active) return;
         if (!profile) {
           navigation.replace('ProfileSetup');
         } else {
           setChecking(false);
         }
-      })
-      .catch(() => {
-        if (!active) return;
-        setChecking(false);
-      });
+      } catch {
+        if (active) setChecking(false);
+      }
+    })();
     return () => {
       active = false;
     };
-  }, [navigation, route.params?.skipProfileCheck]);
+  }, [navigation]);
 
   if (checking) {
     return (

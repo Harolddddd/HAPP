@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login as apiLogin, register as apiRegister, getMe as apiGetMe, UserRole } from '../api/auth';
+import { login as apiLogin, register as apiRegister, getMe as apiGetMe, updateName as apiUpdateName, UserRole } from '../api/auth';
 import { setAuthToken, setUnauthorizedHandler } from '../api/client';
 import { getStoredToken, setStoredToken, deleteStoredToken } from '../utils/tokenStorage';
 
@@ -16,6 +16,7 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
+  updateName: (name: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -76,6 +77,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(res.user);
   }
 
+  async function updateName(name: string) {
+    const updated = await apiUpdateName(name);
+    setUser(updated);
+  }
+
   async function logout() {
     await deleteStoredToken();
     setAuthToken(null);
@@ -88,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, updateName, logout }}>
       {children}
     </AuthContext.Provider>
   );

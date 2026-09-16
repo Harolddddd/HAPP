@@ -70,6 +70,19 @@ authRouter.get('/me', requireAuth, asyncHandler(async (req: AuthRequest, res) =>
   res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
 }));
 
+authRouter.patch('/me', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: 'name is required' });
+  }
+  if (name.length > 20) {
+    return res.status(400).json({ error: 'name must be at most 20 characters' });
+  }
+
+  const user = await prisma.user.update({ where: { id: req.userId! }, data: { name } });
+  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+}));
+
 function signToken(userId: string, role: string): string {
   const secret = process.env.JWT_SECRET || 'dev-secret';
   return jwt.sign({ userId, role }, secret, { expiresIn: '30d' });
