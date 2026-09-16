@@ -74,7 +74,7 @@ export default function DoctorPatientListScreen({ navigation }: Props) {
           data={patients}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
-          ListEmptyComponent={<Text style={styles.empty}>暂无用户</Text>}
+          ListEmptyComponent={<Text style={styles.empty}>暂无患者</Text>}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.row}
