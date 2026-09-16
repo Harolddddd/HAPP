@@ -5,6 +5,7 @@ import type { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../api/auth';
 import PasswordInput, { PasswordInputHandle } from '../components/PasswordInput';
+import { describeAuthError } from '../utils/authErrors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -34,7 +35,7 @@ export default function RegisterScreen({ navigation }: Props) {
     try {
       await register(email, password, name, role);
     } catch (err) {
-      setError('注册失败，请检查填写内容后重试');
+      setError(describeAuthError(err, '注册失败，请检查填写内容后重试'));
     } finally {
       setSubmitting(false);
     }

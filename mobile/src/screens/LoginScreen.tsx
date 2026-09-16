@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import PasswordInput, { PasswordInputHandle } from '../components/PasswordInput';
+import { describeAuthError } from '../utils/authErrors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -22,7 +23,7 @@ export default function LoginScreen({ navigation }: Props) {
     try {
       await login(email, password);
     } catch (err) {
-      setError('邮箱或密码不正确');
+      setError(describeAuthError(err, '邮箱或密码不正确'));
     } finally {
       setSubmitting(false);
     }
