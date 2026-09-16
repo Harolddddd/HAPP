@@ -1,43 +1,50 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleProp, ViewStyle } from 'react-native';
 
-export default function PersonAvatar() {
+interface Props {
+  size?: number;
+  style?: StyleProp<ViewStyle>;
+}
+
+export default function PersonAvatar({ size = 96, style }: Props) {
+  const headSize = size * 0.417;
+  const shouldersSize = size * 0.833;
+
   return (
-    <View style={styles.badge}>
-      <View style={styles.head} />
-      <View style={styles.shoulders} />
+    <View
+      style={[
+        {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          backgroundColor: '#e8eef2',
+          overflow: 'hidden',
+        },
+        style,
+      ]}
+    >
+      <View
+        style={{
+          position: 'absolute',
+          top: size * 0.1875,
+          left: (size - headSize) / 2,
+          width: headSize,
+          height: headSize,
+          borderRadius: headSize / 2,
+          backgroundColor: '#b0bec5',
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: -size * 0.3125,
+          left: (size - shouldersSize) / 2,
+          width: shouldersSize,
+          height: shouldersSize,
+          borderRadius: shouldersSize / 2,
+          backgroundColor: '#b0bec5',
+        }}
+      />
     </View>
   );
 }
-
-const SIZE = 96;
-
-const styles = StyleSheet.create({
-  badge: {
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
-    backgroundColor: '#e8eef2',
-    alignSelf: 'center',
-    marginBottom: 20,
-    overflow: 'hidden',
-  },
-  head: {
-    position: 'absolute',
-    top: 18,
-    left: SIZE / 2 - 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#b0bec5',
-  },
-  shoulders: {
-    position: 'absolute',
-    bottom: -30,
-    left: SIZE / 2 - 40,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#b0bec5',
-  },
-});

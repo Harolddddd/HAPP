@@ -22,6 +22,7 @@ import AdherenceScreen from '../screens/AdherenceScreen';
 import DoctorPatientListScreen from '../screens/DoctorPatientListScreen';
 import DoctorPatientDetailScreen from '../screens/DoctorPatientDetailScreen';
 import AdminStatsScreen from '../screens/AdminStatsScreen';
+import PersonAvatar from '../components/PersonAvatar';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -88,7 +89,11 @@ export default function AppNavigator() {
               options={({ navigation }) => ({
                 title: '首页',
                 headerRight: () => (
-                  <TouchableOpacity onPress={() => navigation.navigate('ProfileSetup')} style={{ padding: 8 }}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('ProfileSetup')}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, padding: 8 }}
+                  >
+                    <PersonAvatar size={22} />
                     <Text style={{ color: '#3498db', fontSize: 16 }}>编辑资料</Text>
                   </TouchableOpacity>
                 ),

@@ -127,7 +127,7 @@ export default function ProfileSetupScreen({ navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>健康档案</Text>
-      <PersonAvatar />
+      <PersonAvatar style={styles.avatar} />
       <TextInput style={styles.input} placeholder="姓名" maxLength={20} value={name} onChangeText={setName} />
       <TextInput style={styles.input} placeholder="年龄" keyboardType="numeric" value={age} onChangeText={setAge} />
 
@@ -209,4 +209,5 @@ const styles = StyleSheet.create({
   chipTextSelected: { color: '#fff' },
   skipButton: { marginTop: 16, alignItems: 'center', padding: 8 },
   skipText: { color: '#3498db' },
+  avatar: { alignSelf: 'center', marginBottom: 20 },
 });
