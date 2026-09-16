@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
 import type { UserRole } from '../api/auth';
+import PasswordInput from '../components/PasswordInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -21,6 +22,10 @@ export default function RegisterScreen({ navigation }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   async function handleRegister() {
+    if (password.length < 4) {
+      Alert.alert('注册失败', '密码长度需为4-15位');
+      return;
+    }
     setSubmitting(true);
     try {
       await register(email, password, name, role);
@@ -45,16 +50,16 @@ export default function RegisterScreen({ navigation }: Props) {
           </TouchableOpacity>
         ))}
       </View>
-      <TextInput style={styles.input} placeholder="姓名" value={name} onChangeText={setName} />
+      <TextInput style={styles.input} placeholder="姓名" maxLength={20} value={name} onChangeText={setName} />
       <TextInput
         style={styles.input}
-        placeholder="邮箱"
+        placeholder="邮箱或手机号"
         autoCapitalize="none"
-        keyboardType="email-address"
+        maxLength={25}
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput style={styles.input} placeholder="密码" secureTextEntry value={password} onChangeText={setPassword} />
+      <PasswordInput style={styles.input} placeholder="密码（4-15位）" value={password} onChangeText={setPassword} />
       <Button title={submitting ? '注册中...' : '注册'} onPress={handleRegister} disabled={submitting} />
       <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.linkText}>已有账号？去登录</Text>

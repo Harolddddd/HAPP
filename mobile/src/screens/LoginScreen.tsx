@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } fr
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
+import PasswordInput from '../components/PasswordInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -28,19 +29,13 @@ export default function LoginScreen({ navigation }: Props) {
       <Text style={styles.title}>登录</Text>
       <TextInput
         style={styles.input}
-        placeholder="邮箱"
+        placeholder="邮箱或手机号"
         autoCapitalize="none"
-        keyboardType="email-address"
+        maxLength={25}
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="密码"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+      <PasswordInput style={styles.input} placeholder="密码" value={password} onChangeText={setPassword} />
       <Button title={submitting ? '登录中...' : '登录'} onPress={handleLogin} disabled={submitting} />
       <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>没有账号？去注册</Text>

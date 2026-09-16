@@ -15,6 +15,15 @@ authRouter.post('/register', authRateLimiter, asyncHandler(async (req, res) => {
   if (!email || !password || !name) {
     return res.status(400).json({ error: 'email, password and name are required' });
   }
+  if (password.length < 4 || password.length > 15) {
+    return res.status(400).json({ error: 'password must be 4-15 characters' });
+  }
+  if (name.length > 20) {
+    return res.status(400).json({ error: 'name must be at most 20 characters' });
+  }
+  if (email.length > 25) {
+    return res.status(400).json({ error: 'email or phone must be at most 25 characters' });
+  }
   if (role !== undefined && !VALID_ROLES.includes(role)) {
     return res.status(400).json({ error: 'role must be one of ' + VALID_ROLES.join(', ') });
   }
