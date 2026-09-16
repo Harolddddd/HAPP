@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useAuth } from '../context/AuthContext';
@@ -42,7 +42,9 @@ export default function LoginScreen({ navigation }: Props) {
         onChangeText={setPassword}
       />
       <Button title={submitting ? '登录中...' : '登录'} onPress={handleLogin} disabled={submitting} />
-      <Button title="没有账号？去注册" onPress={() => navigation.navigate('Register')} />
+      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.linkText}>没有账号？去注册</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -51,4 +53,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 24 },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 24, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
+  linkButton: { marginTop: 16, alignItems: 'center', padding: 8 },
+  linkText: { color: '#3498db' },
 });

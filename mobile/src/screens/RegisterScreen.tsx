@@ -56,7 +56,9 @@ export default function RegisterScreen({ navigation }: Props) {
       />
       <TextInput style={styles.input} placeholder="密码" secureTextEntry value={password} onChangeText={setPassword} />
       <Button title={submitting ? '注册中...' : '注册'} onPress={handleRegister} disabled={submitting} />
-      <Button title="已有账号？去登录" onPress={() => navigation.navigate('Login')} />
+      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.linkText}>已有账号？去登录</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -70,4 +72,6 @@ const styles = StyleSheet.create({
   chipSelected: { backgroundColor: '#3498db', borderColor: '#3498db' },
   chipText: { color: '#333' },
   chipTextSelected: { color: '#fff' },
+  linkButton: { marginTop: 16, alignItems: 'center', padding: 8 },
+  linkText: { color: '#3498db' },
 });
