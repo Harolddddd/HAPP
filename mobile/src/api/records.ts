@@ -4,6 +4,7 @@ export interface DailyRecord {
   id: string;
   userId: string;
   recordDate: string;
+  measuredHour: number | null;
   systolic: number | null;
   diastolic: number | null;
   bloodGlucose: number | null;
@@ -17,7 +18,15 @@ export interface DailyRecord {
 export type DailyRecordInput = Partial<
   Pick<
     DailyRecord,
-    'systolic' | 'diastolic' | 'bloodGlucose' | 'heartRate' | 'weightKg' | 'sleepHours' | 'exerciseMinutes' | 'waterMl'
+    | 'measuredHour'
+    | 'systolic'
+    | 'diastolic'
+    | 'bloodGlucose'
+    | 'heartRate'
+    | 'weightKg'
+    | 'sleepHours'
+    | 'exerciseMinutes'
+    | 'waterMl'
   >
 > & { recordDate: string };
 

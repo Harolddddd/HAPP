@@ -7,6 +7,7 @@ export interface DailyRecordInput {
   sleepHours?: number;
   exerciseMinutes?: number;
   waterMl?: number;
+  measuredHour?: number;
 }
 
 export function validateDailyRecord(input: DailyRecordInput): string[] {
@@ -35,6 +36,9 @@ export function validateDailyRecord(input: DailyRecordInput): string[] {
   }
   if (input.waterMl !== undefined && (input.waterMl < 0 || input.waterMl > 10000)) {
     errors.push('waterMl must be between 0 and 10000');
+  }
+  if (input.measuredHour !== undefined && (input.measuredHour < 0 || input.measuredHour > 23)) {
+    errors.push('measuredHour must be between 0 and 23');
   }
 
   return errors;

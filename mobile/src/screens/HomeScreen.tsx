@@ -3,7 +3,6 @@ import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { getProfile } from '../api/profile';
-import { getProfileSetupSkipped } from '../utils/profileSkip';
 import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -14,24 +13,19 @@ export default function HomeScreen({ navigation }: Props) {
 
   useEffect(() => {
     let active = true;
-    (async () => {
-      const skipped = await getProfileSetupSkipped();
-      if (skipped) {
-        if (active) setChecking(false);
-        return;
-      }
-      try {
-        const profile = await getProfile();
+    getProfile()
+      .then((profile) => {
         if (!active) return;
         if (!profile) {
           navigation.replace('ProfileSetup');
         } else {
           setChecking(false);
         }
-      } catch {
-        if (active) setChecking(false);
-      }
-    })();
+      })
+      .catch(() => {
+        if (!active) return;
+        setChecking(false);
+      });
     return () => {
       active = false;
     };

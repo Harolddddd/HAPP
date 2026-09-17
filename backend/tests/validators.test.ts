@@ -31,4 +31,13 @@ describe('validateDailyRecord', () => {
   it('flags sleepHours out of range', () => {
     expect(validateDailyRecord({ sleepHours: 30 })).toContain('sleepHours must be between 0 and 24');
   });
+
+  it('flags measuredHour out of range', () => {
+    expect(validateDailyRecord({ measuredHour: 24 })).toContain('measuredHour must be between 0 and 23');
+  });
+
+  it('accepts measuredHour at the boundaries', () => {
+    expect(validateDailyRecord({ measuredHour: 0 })).toEqual([]);
+    expect(validateDailyRecord({ measuredHour: 23 })).toEqual([]);
+  });
 });

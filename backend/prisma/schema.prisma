@@ -54,6 +54,7 @@ model DailyRecord {
   userId          String
   user            User     @relation(fields: [userId], references: [id])
   recordDate      DateTime @db.Date
+  measuredHour    Int?
   systolic        Int?
   diastolic       Int?
   bloodGlucose    Float?

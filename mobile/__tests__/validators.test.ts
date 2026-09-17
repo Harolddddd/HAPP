@@ -12,11 +12,28 @@ describe('validateDailyRecord', () => {
         sleepHours: 8,
         exerciseMinutes: 30,
         waterMl: 2000,
+        measuredHour: 8,
       })
     ).toEqual([]);
   });
 
   it('flags systolic out of range', () => {
-    expect(validateDailyRecord({ systolic: 300 })).toContain('systolic must be between 50 and 250');
+    const errors = validateDailyRecord({ systolic: 300 });
+    expect(errors).toContainEqual({ field: 'systolic', message: '收缩压需在50-250之间' });
+  });
+
+  it('flags measuredHour out of range', () => {
+    const errors = validateDailyRecord({ measuredHour: 24 });
+    expect(errors).toContainEqual({ field: 'measuredHour', message: '测量时间需为0-23时' });
+  });
+
+  it('accepts measuredHour at the boundaries', () => {
+    expect(validateDailyRecord({ measuredHour: 0 })).toEqual([]);
+    expect(validateDailyRecord({ measuredHour: 23 })).toEqual([]);
+  });
+
+  it('can flag multiple fields at once', () => {
+    const errors = validateDailyRecord({ systolic: 300, heartRate: 10 });
+    expect(errors.map((e) => e.field).sort()).toEqual(['heartRate', 'systolic']);
   });
 });

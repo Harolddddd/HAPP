@@ -11,6 +11,7 @@ const RECORD_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 recordsRouter.post('/', requireAuth, asyncHandler(async (req: AuthRequest, res) => {
   const {
     recordDate,
+    measuredHour,
     systolic,
     diastolic,
     bloodGlucose,
@@ -43,12 +44,23 @@ recordsRouter.post('/', requireAuth, asyncHandler(async (req: AuthRequest, res) 
     sleepHours,
     exerciseMinutes,
     waterMl,
+    measuredHour,
   });
   if (errors.length > 0) {
     return res.status(400).json({ error: errors.join('; ') });
   }
 
-  const data = { systolic, diastolic, bloodGlucose, heartRate, weightKg, sleepHours, exerciseMinutes, waterMl };
+  const data = {
+    systolic,
+    diastolic,
+    bloodGlucose,
+    heartRate,
+    weightKg,
+    sleepHours,
+    exerciseMinutes,
+    waterMl,
+    measuredHour,
+  };
 
   const record = await prisma.dailyRecord.upsert({
     where: { userId_recordDate: { userId: req.userId!, recordDate: parsedDate } },

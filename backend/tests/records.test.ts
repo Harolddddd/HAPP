@@ -51,6 +51,37 @@ describe('POST /records', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects an out-of-range measuredHour with 400', async () => {
+    const res = await request(app)
+      .post('/records')
+      .set('Authorization', authHeader())
+      .send({ recordDate: '2026-07-12', measuredHour: 25 });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('upserts a valid record with measuredHour and returns it', async () => {
+    mockedPrisma.dailyRecord.upsert.mockResolvedValue({
+      id: 'r1',
+      userId: 'user-1',
+      recordDate: '2026-07-12T00:00:00.000Z',
+      measuredHour: 8,
+      systolic: 120,
+    });
+
+    const res = await request(app)
+      .post('/records')
+      .set('Authorization', authHeader())
+      .send({ recordDate: '2026-07-12', measuredHour: 8, systolic: 120 });
+
+    expect(res.status).toBe(200);
+    expect(mockedPrisma.dailyRecord.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({ measuredHour: 8 }),
+      })
+    );
+  });
+
   it('upserts a valid record and returns it', async () => {
     mockedPrisma.dailyRecord.upsert.mockResolvedValue({
       id: 'r1',
