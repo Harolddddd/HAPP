@@ -1,4 +1,4 @@
-import { validateDailyRecord } from '../src/utils/validators';
+import { validateDailyRecord, hasAnyDailyRecordField } from '../src/utils/validators';
 
 describe('validateDailyRecord', () => {
   it('returns no errors for a fully valid record', () => {
@@ -39,5 +39,23 @@ describe('validateDailyRecord', () => {
   it('accepts measuredHour at the boundaries', () => {
     expect(validateDailyRecord({ measuredHour: 0 })).toEqual([]);
     expect(validateDailyRecord({ measuredHour: 23 })).toEqual([]);
+  });
+});
+
+describe('hasAnyDailyRecordField', () => {
+  it('returns false when every field is omitted', () => {
+    expect(hasAnyDailyRecordField({})).toBe(false);
+  });
+
+  it('returns false when every field is explicitly null or undefined', () => {
+    expect(hasAnyDailyRecordField({ systolic: undefined, diastolic: undefined })).toBe(false);
+  });
+
+  it('returns true when only measuredHour is set', () => {
+    expect(hasAnyDailyRecordField({ measuredHour: 0 })).toBe(true);
+  });
+
+  it('returns true when any other single field is set', () => {
+    expect(hasAnyDailyRecordField({ waterMl: 200 })).toBe(true);
   });
 });

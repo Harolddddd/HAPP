@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { saveDailyRecord } from '../api/records';
-import { validateDailyRecord, FieldError } from '../utils/validators';
+import { validateDailyRecord, hasAnyDailyRecordField, FieldError } from '../utils/validators';
 import { todayLocalDate } from '../utils/date';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'DailyRecord'>;
@@ -50,6 +50,12 @@ export default function DailyRecordScreen({ navigation, route }: Props) {
       exerciseMinutes: toNumberOrUndefined(exerciseMinutes),
       waterMl: toNumberOrUndefined(waterMl),
     };
+
+    if (!hasAnyDailyRecordField(input)) {
+      setFieldErrors({});
+      setError('请至少填写一项内容（测量时间也算）');
+      return;
+    }
 
     const errors = validateDailyRecord(input);
     if (errors.length > 0) {

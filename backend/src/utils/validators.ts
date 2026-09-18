@@ -43,3 +43,7 @@ export function validateDailyRecord(input: DailyRecordInput): string[] {
 
   return errors;
 }
+
+export function hasAnyDailyRecordField(input: DailyRecordInput): boolean {
+  return Object.values(input).some((v) => v !== undefined && v !== null);
+}

@@ -51,6 +51,31 @@ describe('POST /records', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects a record with no fields at all with 400', async () => {
+    const res = await request(app)
+      .post('/records')
+      .set('Authorization', authHeader())
+      .send({ recordDate: '2026-07-12' });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('accepts a record with only measuredHour set', async () => {
+    mockedPrisma.dailyRecord.upsert.mockResolvedValue({
+      id: 'r1',
+      userId: 'user-1',
+      recordDate: '2026-07-12T00:00:00.000Z',
+      measuredHour: 8,
+    });
+
+    const res = await request(app)
+      .post('/records')
+      .set('Authorization', authHeader())
+      .send({ recordDate: '2026-07-12', measuredHour: 8 });
+
+    expect(res.status).toBe(200);
+  });
+
   it('rejects an out-of-range measuredHour with 400', async () => {
     const res = await request(app)
       .post('/records')

@@ -1,4 +1,4 @@
-import { validateDailyRecord } from '../src/utils/validators';
+import { validateDailyRecord, hasAnyDailyRecordField } from '../src/utils/validators';
 
 describe('validateDailyRecord', () => {
   it('returns no errors for a fully valid record', () => {
@@ -35,5 +35,19 @@ describe('validateDailyRecord', () => {
   it('can flag multiple fields at once', () => {
     const errors = validateDailyRecord({ systolic: 300, heartRate: 10 });
     expect(errors.map((e) => e.field).sort()).toEqual(['heartRate', 'systolic']);
+  });
+});
+
+describe('hasAnyDailyRecordField', () => {
+  it('returns false when every field is omitted', () => {
+    expect(hasAnyDailyRecordField({})).toBe(false);
+  });
+
+  it('returns true when only measuredHour is set, including hour 0', () => {
+    expect(hasAnyDailyRecordField({ measuredHour: 0 })).toBe(true);
+  });
+
+  it('returns true when any other single field is set', () => {
+    expect(hasAnyDailyRecordField({ waterMl: 200 })).toBe(true);
   });
 });

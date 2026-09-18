@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
-import { validateDailyRecord } from '../utils/validators';
+import { validateDailyRecord, hasAnyDailyRecordField } from '../utils/validators';
 import { asyncHandler } from '../utils/asyncHandler';
 
 export const recordsRouter = Router();
@@ -48,6 +48,10 @@ recordsRouter.post('/', requireAuth, asyncHandler(async (req: AuthRequest, res) 
   });
   if (errors.length > 0) {
     return res.status(400).json({ error: errors.join('; ') });
+  }
+
+  if (!hasAnyDailyRecordField({ systolic, diastolic, bloodGlucose, heartRate, weightKg, sleepHours, exerciseMinutes, waterMl, measuredHour })) {
+    return res.status(400).json({ error: 'at least one field must be provided' });
   }
 
   const data = {
